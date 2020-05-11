@@ -31,12 +31,20 @@ const renderMessages = (messages) => {
   }
 };
 
+let lastUpdate = 0;
 
 const updateMessages = () => {
   // @TODO: funkce stahující zprávy ze server a přidávající je na stránku
   fetch('https://czechichat.herokuapp.com/api/list-messages')
     .then(response => response.json())
-    .then(data => renderMessages(data.messages))
+    .then(data => {
+      const serverLastUpdate = data.lastUpdate;
+      if (serverLastUpdate !== lastUpdate) {
+        lastUpdate = serverLastUpdate;
+        renderMessages(data.messages);
+      }
+    }
+    )
 
 };
 
@@ -50,6 +58,10 @@ const messageInputElement = document.querySelector('#message-input');
 const onSubmit = (event) => {
   event.preventDefault(); // Zamezí přesměrování na jinou stránku při odesílání formuláře
 
+  document.querySelector('button').disabled = true;
+
+  setTimeout(() => { document.querySelector('button').disabled = false }, 2000);
+
   console.log(
     'Data:',
     JSON.stringify({
@@ -58,7 +70,7 @@ const onSubmit = (event) => {
     }),
   );
 
-  //@TODO: odešli zprávu na server
+  // @TODO: odešli zprávu na server
   fetch('https://czechichat.herokuapp.com/api/send-message', {
     method: 'POST',
     headers: {
@@ -69,6 +81,7 @@ const onSubmit = (event) => {
       message: messageInputElement.value,
     })
   })
+  messageInputElement.value = '';
 };
 
 document.querySelector('#send-form').addEventListener('submit', onSubmit);

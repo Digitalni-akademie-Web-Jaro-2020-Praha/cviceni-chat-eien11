@@ -58,7 +58,17 @@ const onSubmit = (event) => {
     }),
   );
 
-  // @TODO: odešli zprávu na server
+  //@TODO: odešli zprávu na server
+  fetch('https://czechichat.herokuapp.com/api/send-message', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: nameInputElement.value,
+      message: messageInputElement.value,
+    })
+  })
 };
 
 document.querySelector('#send-form').addEventListener('submit', onSubmit);
